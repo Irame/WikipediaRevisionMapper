@@ -22,7 +22,7 @@ public class ResultGenerator {
 
             srcTitle = sourceData.getTitle(srcId);
 
-            if (!sourceData.isArticle(srcId)) {
+            if (sourceData.isDisambiguation(srcId)) {
                 // Source entry is either redirect/disambiguation and ignored
                 type = MappedType.SOURCE_IGNORED;
                 if (targetData.hasId(srcId)) {
@@ -45,7 +45,11 @@ public class ResultGenerator {
                 // not a redirection, verifying for disambiguation
                 type = MappedType.DISAMBIGUATED;
 
-                tgtId = targetData.getDisambiguatedId(srcId, sourceData.getPageLinks(srcId));
+                if (sourceData.isRedirect(srcId)) {
+                    tgtId = targetData.getDisambiguatedId(srcId, sourceData.getPageLinks(sourceData.getRedirectedId(srcId)));
+                } else {
+                    tgtId = targetData.getDisambiguatedId(srcId, sourceData.getPageLinks(srcId));
+                }
                 tgtTitle = targetData.getTitle(tgtId);
 
                 logger_.info(srcTitle + "(" + srcId + ") disambiguates to : " + tgtTitle + "(" + tgtId + ")");

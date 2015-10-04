@@ -358,7 +358,7 @@ public class WikipediaRevisionMapperTest {
         assertEquals(true, !hshResults.get("Test1").equals("Test3"));
     }
 
-    @Ignore("score computation not implemented yet")
+    //@Ignore("score computation not implemented yet")
     @Test
     public void testDisambiguationEntries() throws IOException, XMLStreamException, URISyntaxException {
         // source dump
@@ -370,7 +370,7 @@ public class WikipediaRevisionMapperTest {
 
         // default diff will also include all unchanged entries
         Map<String, String> hshResults = WikipediaRevisionMapper.map(tmpSrcDump, tmpTargetDump);
-        assertEquals(4, hshResults.size());
+        assertEquals(7, hshResults.size());
 
         // setting the flag to false will include unchanged entries
         hshResults = WikipediaRevisionMapper.map(tmpSrcDump, tmpTargetDump, false);

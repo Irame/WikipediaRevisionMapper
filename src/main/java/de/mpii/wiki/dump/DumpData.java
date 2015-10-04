@@ -1,5 +1,7 @@
 package de.mpii.wiki.dump;
 
+import de.mpii.wiki.compute.DisambiguationScoreCalculator;
+import gnu.trove.impl.Constants;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -16,6 +18,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DumpData {
+    private static final int TINTMAP_NO_ENTRY_VALUE = -1;
+
     private final DumpType dumpType;
 
     private static final Pattern linkPattern = Pattern.compile("\\[\\[(.*?)(?:\\]\\]|\\|)");
@@ -50,7 +54,7 @@ public class DumpData {
 
     private void init() {
         idTitleMap = new TIntObjectHashMap<>();
-        titleIdMap = new TObjectIntHashMap<>();
+        titleIdMap = new TObjectIntHashMap<>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, TINTMAP_NO_ENTRY_VALUE);
 
         disambiguations = new TIntObjectHashMap<>();
         redirections = new TIntObjectHashMap<>();
@@ -64,7 +68,8 @@ public class DumpData {
 
     public void addPageEntry(int id, String title) {
         idTitleMap.put(id, title);
-        titleIdMap.put(title, id);
+        //TODO: check if 'toLowerCase()' is correct
+        titleIdMap.put(title.toLowerCase(), id);
     }
 
     public void addContentInfo(int id, String content) {
@@ -134,13 +139,16 @@ public class DumpData {
         if (tgtPageDisambiguationLinks == null || tgtPageDisambiguationLinks.isEmpty())
             return result;
 
+        double weight = tgtPageDisambiguationLinks.size();
+
         // for each disambiguation option, get the content stored in pageContent and compute similarity
         TIntIterator iterator = tgtPageDisambiguationLinks.iterator();
         while (iterator.hasNext()) {
             int tgtPageId = iterator.next();
-            TIntList tgtPageLinks = articleLinks.get(tgtPageId);
-            double score = 0; //TODO: compute the score in a good way (input: srcPageLinks, tgtPageLinks [, tgtPageId])
-            //logger_.debug("Target Disambiguation Page : "+ tgtPageTitle + " with score : " + score);
+            double score = DisambiguationScoreCalculator.compute(articleLinks.get(tgtPageId), srcPageLinks);
+            //TODO: weight needs improvement
+            score *= weight--;
+            logger_.debug("Target Disambiguation Page : "+ tgtPageId + " with score : " + score);
             if (score > maxScore) {
                 result = tgtPageId;
                 maxScore = score;
@@ -191,7 +199,11 @@ public class DumpData {
 
         Matcher redirectMatcher = linkPattern.matcher(content);
         while (redirectMatcher.find()) {
-            linkIds.add(titleIdMap.get(redirectMatcher.group(1)));
+            // TODO: check if 'toLowerCase()' is correct
+            int linkId = titleIdMap.get(redirectMatcher.group(1).toLowerCase());
+            // TODO: check if non existing links should be included
+            if (linkId != TINTMAP_NO_ENTRY_VALUE)
+                linkIds.add(linkId);
         }
         return linkIds;
     }

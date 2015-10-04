@@ -42,7 +42,7 @@ __NOTOC__
       </contributor>
       <comment>more disambiguation info</comment>
       <text xml:space='preserve'>
-	Albert Einstein was a German-American theoretical physicist. Einstein was born in [[Ulm|Ulm]], [[Germany|Germany]]. He developed [[general theory of relativity]]. He was awarded Nobel prize in Physics in 1921.
+	Albert Einstein was a German-American theoretical physicist. Einstein was born in [[Ulm|Ulm]], [[Germany|Germany]]. He developed [[general relativity|general theory of relativity]]. He was awarded Nobel prize in Physics in 1921.
       </text>
     </revision>
   </page>
@@ -95,6 +95,57 @@ __NOTOC__
       </contributor>
       <text xml:space='preserve'>
 	The Einstein Tower (German: Einsteinturm) is an astrophysical observatory in the Albert Einstein Science Park in [[Potsdam|Potsdam]], Germany built by [[Erich Mendelsohn]]. It was built on the summit of the Potsdam Telegraphenberg to house a solar telescope designed by the astronomer Erwin Finlay-Freundlich. The telescope supports experiments and observations to validate (or disprove) [[Albert_Einstein|Albert Einstein]]'s relativity theory. The building was first conceived around 1917, built from 1919 to 1921 after a fund-raising drive, and became operational in 1924. Although [[Albert_Einstein|Einstein]] never worked there, he supported the construction and operation of the telescope. It is still a working solar observatory today as part of the Leibniz Institute for Astrophysics Potsdam. Light from the telescope is directed down through the shaft to the basement where the instruments and laboratory are located. There were more than half a dozen telescopes in the laboratory.
+      </text>
+    </revision>
+  </page>
+  <page>
+    <title>Ulm</title>
+    <ns>0</ns>
+    <id>55555</id>
+      <sha1></sha1>
+    <revision>
+      <id>479419610</id>
+      <timestamp>2012-02-29T04:44:51Z</timestamp>
+      <contributor>
+        <username>Macrakis</username>
+        <id>49920</id>
+      </contributor>
+      <text xml:space='preserve'>
+	Ulm is a city in the federal German state of [[Baden-Württemberg]], situated on the [[River Danube]]. The city, whose population is estimated at 120,000 (2006), forms an urban district of its own ({{lang-de|Stadtkreis}}) and is the administrative seat of the [[Alb-Donau (district)|Alb-Donau district]]. Ulm, founded around 850, is rich in history and traditions as a former [[Free Imperial City]] ({{lang-de|freie Reichsstadt}}). Today, it is an economic centre due to its varied industries, and it is the seat of the [[University of Ulm]]. Internationally, Ulm is primarily known for having the church with the tallest steeple in the world (161.53 m or 529.95 feet), the Gothic minster ([[Ulm Minster]], German: Ulmer Münster) and as the birthplace of [[Albert Einstein]].
+      </text>
+    </revision>
+  </page>
+  <page>
+    <title>Germany</title>
+    <ns>0</ns>
+    <id>66666</id>
+      <sha1></sha1>
+    <revision>
+      <id>479419610</id>
+      <timestamp>2012-02-29T04:44:51Z</timestamp>
+      <contributor>
+        <username>Macrakis</username>
+        <id>49920</id>
+      </contributor>
+      <text xml:space='preserve'>
+	Germany, officially the '''Federal Republic of Germany''' ({{lang-de|Bundesrepublik Deutschland|links=no}}, {{Audio|De-Bundesrepublik_Deutschland.ogg|listen}}),{{efn|IPA transcription of "''Bundesrepublik Deutschland''": {{IPA-de|ˈbʊndəsʁepuˌbliːk ˈdɔʏtʃlant|}}}} is a [[Federation|federal]] [[parliamentary republic]] in [[Western Europe|western]]-[[central Europe]]. It includes 16 [[States of Germany|constituent states]] and covers an area of {{convert|357,021|km2|sqmi}} with a largely temperate seasonal climate. Its [[capital city|capital]] and [[List of cities in Germany by population|largest city]] is [[Berlin]]. With 81 million inhabitants, Germany is the most populous member state in the [[European Union]]. After the United States, it is the second most popular [[Immigration to Germany|migration destination]] in the world.
+      </text>
+    </revision>
+  </page>
+  <page>
+    <title>general relativity</title>
+    <ns>0</ns>
+    <id>77777</id>
+      <sha1></sha1>
+    <revision>
+      <id>479419610</id>
+      <timestamp>2012-02-29T04:44:51Z</timestamp>
+      <contributor>
+        <username>Macrakis</username>
+        <id>49920</id>
+      </contributor>
+      <text xml:space='preserve'>
+	General relativity, also known as the '''general theory of relativity''', is the [[Differential geometry|geometric]] [[Theoretical physics|theory]] of [[gravitation]] published by [[Albert Einstein]] in 1915 and the current description of gravitation in [[modern physics]]. General relativity generalizes [[special relativity]] and [[Newton's law of universal gravitation]], providing a unified description of gravity as a geometric property of [[space]] and [[Time in physics|time]], or [[spacetime]]. In particular, the [[curvature]] of spacetime is directly related to the [[energy]] and [[momentum]] of whatever [[matter]] and [[radiation]] are present. The relation is specified by the [[Einstein field equations]], a system of [[partial differential equation]]s.
       </text>
     </revision>
   </page>
