@@ -11,8 +11,6 @@ import de.mpii.wiki.result.MappedResults;
 import de.mpii.wiki.result.MappedType;
 import de.mpii.wiki.result.ResultGenerator;
 
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
 import java.text.ParseException;
@@ -156,28 +154,18 @@ public class WikipediaRevisionMapper {
     }
 
     private static MappedResults mapImpl(File oldDump, File newDump) throws IOException, XMLStreamException  {
-
-        XMLInputFactory factory = XMLInputFactory.newInstance();
-
-        XMLEventReader newDumpTitleReader = factory.createXMLEventReader(new FileReader(newDump));
-        XMLEventReader newDumpContentReader = factory.createXMLEventReader(new FileReader(newDump));
-        XMLEventReader oldDumpTitleReader = factory.createXMLEventReader(new FileReader(oldDump));
-        XMLEventReader oldDumpContentReader = factory.createXMLEventReader(new FileReader(oldDump));
-
         DumpData newDumpData = new DumpData(DumpType.TARGET);
         DumpData oldDumpData = new DumpData(DumpType.SOURCE);
 
         long start = System.currentTimeMillis();
         logger_.debug("Processing Target Dump...");
-        DumpReader.read(newDumpTitleReader, newDumpData, DumpReader.ReadMode.TITLE);
-        DumpReader.read(newDumpContentReader, newDumpData, DumpReader.ReadMode.CONTENT);
+        DumpReader.read(newDump, newDumpData);
         logger_.info("Time to scan target dump : " + (System.currentTimeMillis() - start)/1000 + " s.");
 
         // iterate over the source dump
         start = System.currentTimeMillis();
         logger_.debug("Processing Source Dump...");
-        DumpReader.read(oldDumpTitleReader, oldDumpData, DumpReader.ReadMode.TITLE);
-        DumpReader.read(oldDumpContentReader, oldDumpData, DumpReader.ReadMode.CONTENT);
+        DumpReader.read(oldDump, oldDumpData);
         logger_.info("Time to scan source dump : " + (System.currentTimeMillis() - start)/1000 + " s.");
 
         return ResultGenerator.generate(oldDumpData, newDumpData);
