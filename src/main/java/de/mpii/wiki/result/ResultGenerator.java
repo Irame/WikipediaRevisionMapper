@@ -13,7 +13,7 @@ public class ResultGenerator {
 
         int[] srcIds = sourceData.getPageIds();
         for (int srcId : srcIds) {
-            int tgtId = 0;
+            int tgtId = srcId;
 
             MappedType type;
 
@@ -55,8 +55,8 @@ public class ResultGenerator {
                 logger_.info(srcTitle + "(" + srcId + ") disambiguates to : " + tgtTitle + "(" + tgtId + ")");
             } else if (!targetData.hasId(srcId)) {
                 type = MappedType.DELETED;
-                //TODO : check which one to use null or srcTitle?
                 tgtTitle = null;
+                tgtId = -1;
             } else {
                 // if not any of above, check whether it has been updated/unchanged!
                 tgtTitle = targetData.getTitle(srcId);

@@ -68,7 +68,6 @@ public class DumpData {
 
     public void addPageEntry(int id, String title) {
         idTitleMap.put(id, title);
-        //TODO: check if 'toLowerCase()' is correct
         titleIdMap.put(title.toLowerCase(), id);
     }
 
@@ -139,15 +138,14 @@ public class DumpData {
         if (tgtPageDisambiguationLinks == null || tgtPageDisambiguationLinks.isEmpty())
             return result;
 
-        double weight = tgtPageDisambiguationLinks.size();
+        double linkPositionOnPage = 1;
 
         // for each disambiguation option, get the content stored in pageContent and compute similarity
         TIntIterator iterator = tgtPageDisambiguationLinks.iterator();
         while (iterator.hasNext()) {
             int tgtPageId = iterator.next();
             double score = DisambiguationScoreCalculator.compute(articleLinks.get(tgtPageId), srcPageLinks);
-            //TODO: weight needs improvement
-            score *= weight--;
+            score /= linkPositionOnPage++;
             logger_.debug("Target Disambiguation Page : "+ tgtPageId + " with score : " + score);
             if (score > maxScore) {
                 result = tgtPageId;
@@ -172,7 +170,6 @@ public class DumpData {
                 return itK;
             }
 
-            //FIXME: if tmp size is greater than 1, then something is wrong with the redirect page : Not handled!
             if (tmp.size() > 1)
                 logger_.warn("Redirect page '{}' (id: {}) has more than one link (taking the first one)", idTitleMap.get(redirectId), redirectId);
 
@@ -199,9 +196,7 @@ public class DumpData {
 
         Matcher redirectMatcher = linkPattern.matcher(content);
         while (redirectMatcher.find()) {
-            // TODO: check if 'toLowerCase()' is correct
             int linkId = titleIdMap.get(redirectMatcher.group(1).toLowerCase());
-            // TODO: check if non existing links should be included
             if (linkId != TINTMAP_NO_ENTRY_VALUE)
                 linkIds.add(linkId);
         }
