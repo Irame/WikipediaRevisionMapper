@@ -54,14 +54,10 @@ public class DumpReaderTest {
                 + "</mediawiki>");
         bw.close();
 
-        XMLInputFactory factory = XMLInputFactory.newInstance();
-
-        XMLEventReader dumpTitleReader = factory.createXMLEventReader(new FileReader(tmpDump));
-        XMLEventReader dumpContentReader = factory.createXMLEventReader(new FileReader(tmpDump));
         DumpData dumpData = new DumpData(DumpType.TARGET);
 
-        DumpReader.read(dumpTitleReader, dumpData, DumpReader.ReadMode.TITLE);
-        DumpReader.read(dumpContentReader, dumpData, DumpReader.ReadMode.CONTENT);
+        DumpReader.read(tmpDump, dumpData);
+        DumpReader.read(tmpDump, dumpData);
 
         assertEquals(4, dumpData.size());
 
@@ -120,14 +116,10 @@ public class DumpReaderTest {
                 + "</mediawiki>");
         bw.close();
 
-        XMLInputFactory factory = XMLInputFactory.newInstance();
-
-        XMLEventReader dumpTitleReader = factory.createXMLEventReader(new FileReader(tmpDump));
-        XMLEventReader dumpContentReader = factory.createXMLEventReader(new FileReader(tmpDump));
         DumpData dumpData = new DumpData(DumpType.SOURCE);
 
-        DumpReader.read(dumpTitleReader, dumpData, DumpReader.ReadMode.TITLE);
-        DumpReader.read(dumpContentReader, dumpData, DumpReader.ReadMode.CONTENT);
+        DumpReader.read(tmpDump, dumpData);
+        DumpReader.read(tmpDump, dumpData);
 
         assertEquals(4, dumpData.size());
 

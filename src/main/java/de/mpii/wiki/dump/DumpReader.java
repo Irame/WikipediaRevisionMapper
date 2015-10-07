@@ -100,7 +100,7 @@ public class DumpReader {
 //    data.resolveAdditionalInfo();
     }
 
-    public enum ReadMode {
+    private enum ReadMode {
         TITLE, CONTENT
     }
 }
