@@ -43,11 +43,11 @@ public class ResultGenerator {
                 logger_.debug(srcTitle + "(" + srcId + ") redirects to : " + tgtTitle + "(" + tgtId + ")");
             } else if (targetData.isDisambiguation(srcId)) {
                 // not a redirection, verifying for disambiguation
-                type = MappedType.DISAMBIGUATED;
-
                 if (sourceData.isRedirect(srcId)) {
+                    type = MappedType.REDIRECTED_DISAMBIGUATED;
                     tgtId = targetData.getDisambiguatedId(srcId, sourceData.getPageLinks(sourceData.getRedirectedId(srcId)));
                 } else {
+                    type = MappedType.DISAMBIGUATED;
                     tgtId = targetData.getDisambiguatedId(srcId, sourceData.getPageLinks(srcId));
                 }
                 tgtTitle = targetData.getTitle(tgtId);
