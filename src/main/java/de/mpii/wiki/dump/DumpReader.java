@@ -41,6 +41,8 @@ public class DumpReader {
 
         boolean withinRevisionTag = false;
 
+        int pagesProcessed = 0;
+
         while (reader.hasNext()) {
             XMLEvent event = reader.nextEvent();
             if (event.isStartElement()) {
@@ -91,13 +93,15 @@ public class DumpReader {
                         pageId = -1;
                         title = null;
                         pageText = null;
+                        pagesProcessed++;
                         break;
                     default:
                         break;
                 }
             }
+            if (pagesProcessed % 100_000 == 0)
+                logger_.info("Processed: {}k", pagesProcessed/1000);
         }
-//    data.resolveAdditionalInfo();
     }
 
     private enum ReadMode {

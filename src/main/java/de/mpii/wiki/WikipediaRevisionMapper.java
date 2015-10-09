@@ -239,13 +239,13 @@ public class WikipediaRevisionMapper {
         DumpData oldDumpData = new DumpData(evalMode ? DumpType.SOURCE_EVAL : DumpType.SOURCE);
 
         long start = System.currentTimeMillis();
-        logger_.debug("Processing Target Dump...");
+        logger_.info("Processing Target Dump...");
         DumpReader.read(newDump, newDumpData);
         logger_.info("Time to scan target dump : " + (System.currentTimeMillis() - start) / 1000 + " s.");
 
         // iterate over the source dump
         start = System.currentTimeMillis();
-        logger_.debug("Processing Source Dump...");
+        logger_.info("Processing Source Dump...");
         DumpReader.read(oldDump, oldDumpData);
         logger_.info("Time to scan source dump : " + (System.currentTimeMillis() - start) / 1000 + " s.");
 
