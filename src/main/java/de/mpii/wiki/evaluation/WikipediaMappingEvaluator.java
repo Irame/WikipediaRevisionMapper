@@ -1,6 +1,7 @@
 package de.mpii.wiki.evaluation;
 
 import de.mpii.wiki.result.MappedResult;
+import de.mpii.wiki.result.MappedType;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
@@ -32,14 +33,23 @@ public class WikipediaMappingEvaluator {
     }
 
     public static void main(String[] args) throws FileNotFoundException, XMLStreamException {
-        if (args.length != 1) {
-            System.out.println("Usage: WikipediaMappingEvaluator <resultFile>");
+        if (args.length < 1 || args.length > 2) {
+            System.out.println("Usage: WikipediaMappingEvaluator <resultFile> [<mappedType>]");
             System.exit(1);
         }
         File resultFile = new File(args[0]);
+        Set<MappedType> typesToEvaluate;
+        if (args.length == 2) {
+            typesToEvaluate = new HashSet<>();
+            for (String typeString : args[1].split(",")) {
+                typesToEvaluate.add(MappedType.valueOf(typeString));
+            }
+        } else {
+            typesToEvaluate = new HashSet<>(Arrays.asList(MappedType.values()));
+        }
 
         System.out.format("Start reading '%s' ...\n", resultFile.getName());
-        List<MappedResult> results = MappingResultReader.read(resultFile);
+        List<MappedResult> results = MappingResultReader.read(resultFile, typesToEvaluate);
         System.out.format("Finished reading '%s'!\n", resultFile.getName());
         List<MappedResult> correctResults = new ArrayList<>();
         List<MappedResult> incorrectResults = new ArrayList<>();
