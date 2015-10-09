@@ -30,10 +30,20 @@ import java.util.stream.Collectors;
  *         Parts of this code are taken from https://github.com/vvenkatr/wiki-tools by vvenkatr.
  */
 public class WikipediaRevisionMapper {
+    public static final String EVAL_XML_MAPPING_RESULT_TAG = "MappingResult";
+    public static final String EVAL_XML_ENTRY_TAG = "Entry";
+    public static final String EVAL_XML_MAPPING_TYPE_TAG = "MappingType";
+    public static final String EVAL_XML_SOURCE_ID_TAG = "SourceId";
+    public static final String EVAL_XML_SOURCE_TITLE_TAG = "SourceTitle";
+    public static final String EVAL_XML_SOURCE_TEXT_TAG = "SourceText";
+    public static final String EVAL_XML_TARGET_ID_TAG = "TargetId";
+    public static final String EVAL_XML_TARGET_TITLE_TAG = "TargetTitle";
+    public static final String EVAL_XML_TARGET_TEXT_TAG = "TargetText";
 
     private static Logger logger_ = LoggerFactory.getLogger(WikipediaRevisionMapper.class);
 
     private static boolean evalMode;
+
 
     /**
      * Returns Map of Wiki page titles from old dump to new dump. The map also includes page entries that
@@ -177,31 +187,31 @@ public class WikipediaRevisionMapper {
             String targetText;
 
             writer.writeStartDocument();
-            writer.writeStartElement("MappingResult");
+            writer.writeStartElement(EVAL_XML_MAPPING_RESULT_TAG);
             for (MappedResult result : results) {
-                writer.writeStartElement("Entry");
-                writer.writeStartElement("MappingType");
+                writer.writeStartElement(EVAL_XML_ENTRY_TAG);
+                writer.writeStartElement(EVAL_XML_MAPPING_TYPE_TAG);
                 writer.writeCharacters(result.getMappingType().toString());
                 writer.writeEndElement();
-                writer.writeStartElement("SourceId");
+                writer.writeStartElement(EVAL_XML_SOURCE_ID_TAG);
                 writer.writeCharacters(String.valueOf(result.getSourceId()));
                 writer.writeEndElement();
-                writer.writeStartElement("SourceTitle");
+                writer.writeStartElement(EVAL_XML_SOURCE_TITLE_TAG);
                 writer.writeCharacters(result.getSourceTitle());
                 writer.writeEndElement();
                 if ((sourceText = result.getSourceText()) != null) {
-                    writer.writeStartElement("SourceText");
+                    writer.writeStartElement(EVAL_XML_SOURCE_TEXT_TAG);
                     writer.writeCharacters(sourceText);
                     writer.writeEndElement();
                 }
-                writer.writeStartElement("TargetId");
+                writer.writeStartElement(EVAL_XML_TARGET_ID_TAG);
                 writer.writeCharacters(String.valueOf(result.getTargetId()));
                 writer.writeEndElement();
-                writer.writeStartElement("TargetTitle");
+                writer.writeStartElement(EVAL_XML_TARGET_TITLE_TAG);
                 writer.writeCharacters(result.getTargetTitle());
                 writer.writeEndElement();
                 if ((targetText = result.getTargetText()) != null) {
-                    writer.writeStartElement("TargetText");
+                    writer.writeStartElement(EVAL_XML_TARGET_TEXT_TAG);
                     writer.writeCharacters(targetText);
                     writer.writeEndElement();
                 }
