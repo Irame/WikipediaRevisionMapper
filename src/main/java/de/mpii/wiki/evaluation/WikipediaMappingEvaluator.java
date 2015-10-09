@@ -32,7 +32,7 @@ public class WikipediaMappingEvaluator {
     }
 
     public static void main(String[] args) throws FileNotFoundException, XMLStreamException {
-        if (args.length != 2) {
+        if (args.length != 1) {
             System.out.println("Usage: WikipediaMappingEvaluator <resultFile>");
             System.exit(1);
         }
@@ -49,7 +49,7 @@ public class WikipediaMappingEvaluator {
 
         Random random = new Random(System.currentTimeMillis());
         Scanner scanner = new Scanner(System.in);
-        System.out.format(">> START (file: %s) <<<\n", resultFile.getName());
+        System.out.format(">> START (file: %s) <<<\n", resultFile.getAbsolutePath());
         do {
             MappedResult curMappedResult = results.remove(random.nextInt(results.size()));
             System.out.format(
@@ -68,8 +68,12 @@ public class WikipediaMappingEvaluator {
             String userInput = scanner.next();
             if (acceptInput.contains(userInput.toLowerCase())) {
                 correctResults.add(curMappedResult);
+                System.out.println(">>> Tagged as CORRECT");
             } else if (declineInput.contains(userInput.toLowerCase())) {
                 incorrectResults.add(curMappedResult);
+                System.out.println(">>> Tagged as INCORRECT");
+            } else {
+                System.out.println(">>> Skipped");
             }
             wilsonResult = wilson(correctResults.size() + incorrectResults.size(), correctResults.size());
             System.out.format(">>> Wilson Intervall: Center = %.2f, Distance = %.2f\n", wilsonResult[0], wilsonResult[1]);
