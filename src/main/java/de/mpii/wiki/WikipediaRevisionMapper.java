@@ -161,6 +161,7 @@ public class WikipediaRevisionMapper {
             String srcTitle = result.getSourceTitle();
             String tgtTitle = result.getTargetTitle();
             MappedType mapType = result.getMappingType();
+            // TODO: make to wiki links (URLEncoder.encode(String, String))
             writer.append(srcTitle).append("\t").append(tgtTitle).append("\t").append(mapType.toString());
 
             writer.append("\n");
