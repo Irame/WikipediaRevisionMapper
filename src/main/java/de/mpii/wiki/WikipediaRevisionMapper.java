@@ -15,6 +15,8 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.*;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
@@ -161,14 +163,19 @@ public class WikipediaRevisionMapper {
             String srcTitle = result.getSourceTitle();
             String tgtTitle = result.getTargetTitle();
             MappedType mapType = result.getMappingType();
-            // TODO: make to wiki links (URLEncoder.encode(String, String))
-            writer.append(srcTitle).append("\t").append(tgtTitle).append("\t").append(mapType.toString());
+            writer.append(titleToWikiLink(srcTitle)).append("\t")
+                    .append(titleToWikiLink(tgtTitle)).append("\t")
+                    .append(mapType.toString());
 
             writer.append("\n");
         }
 
         writer.flush();
         writer.close();
+    }
+
+    private static String titleToWikiLink(String title) throws UnsupportedEncodingException {
+        return "http://en.wikipedia.org/wiki/" + URLEncoder.encode(title, StandardCharsets.UTF_8.name()).replace("+", "_");
     }
 
     private static void writeFileContentAsXML(File file, List<MappedResult> results) throws IOException {
