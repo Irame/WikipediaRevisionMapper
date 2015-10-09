@@ -77,16 +77,14 @@ public class DumpData {
 
         PageType pageType = PageType.parseFrom(idTitleMap.get(id), content);
 
-        // store redirections and disambiguation only for target dump
+        // store disambiguation only for target dump
         TIntList links = extractLinks(content);
-        if (dumpType == DumpType.TARGET && pageType.isSpecialPage()) {
-            if (pageType == PageType.REDIRECT) {
-                redirections.put(id, links);
-            } else { // pageType == PageType.DISAMBIGUATION
-                disambiguations.put(id, links);
-            }
+        if (dumpType == DumpType.TARGET && pageType == PageType.DISAMBIGUATION) {
+            disambiguations.put(id, links);
         } else if (pageType == PageType.ARTICLE) {
             articleLinks.put(id, links);
+        } else if (pageType == PageType.REDIRECT) {
+            redirections.put(id, links);
         }
     }
 
