@@ -312,6 +312,8 @@ public class WikipediaRevisionMapper {
         String tgtDump = cmd.getOptionValue('t');
 
         evalMode = cmd.hasOption('e');
+        if (evalMode)
+            logger_.info(">>> Evaluation Mode <<<");
 
         if (cmd.hasOption('w')) {
             File outputFile = new File(cmd.getOptionValue('w'));
