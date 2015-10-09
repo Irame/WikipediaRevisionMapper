@@ -24,8 +24,6 @@ public class ResultGenerator {
             String tgtText = null;
 
             srcTitle = sourceData.getTitle(srcId);
-            
-            boolean redirectedSource = false;
 
             if (sourceData.isDisambiguation(srcId)) {
                 // Source entry is either redirect/disambiguation and ignored
@@ -35,48 +33,43 @@ public class ResultGenerator {
                 } else {
                     tgtTitle = srcTitle;
                 }
-            } else {
-                if (sourceData.isRedirect(srcId)) {
-                    srcId = sourceData.getRedirectedId(srcId);
-                    srcTitle = sourceData.getTitle(srcId);
-                    redirectedSource = true;
-                }
-                if (targetData.isRedirect(srcId)) {
-                    // source id is valid, check target for redirections
-                    tgtId = targetData.getRedirectedId(srcId);
-                    if (tgtId == srcId) {
-                        type = MappedType.REDIRECTED_CYCLE;
-                    } else {
-                        type = MappedType.REDIRECTED;
-                    }
-
-                    tgtTitle = targetData.getTitle(tgtId);
-                    logger_.debug(srcTitle + "(" + srcId + ") redirects to : " + tgtTitle + "(" + tgtId + ")");
-                } else if (targetData.isDisambiguation(srcId)) {
-                    // not a redirection, verifying for disambiguation
-                    if (redirectedSource) {
-                        type = MappedType.REDIRECTED_DISAMBIGUATED;
-                    } else {
-                        type = MappedType.DISAMBIGUATED;
-                    }
-                    tgtId = targetData.getDisambiguatedId(srcId, sourceData.getPageLinks(srcId));
-                    tgtTitle = targetData.getTitle(tgtId);
-                    srcText = sourceData.getPageText(srcId);
-                    tgtText = targetData.getPageText(tgtId);
-                    logger_.info(srcTitle + "(" + srcId + ") disambiguates to : " + tgtTitle + "(" + tgtId + ")");
-                } else if (!targetData.hasId(srcId)) {
-                    type = MappedType.DELETED;
-                    tgtTitle = null;
-                    tgtId = -1;
+            } else if (targetData.isRedirect(srcId)) {
+                // source id is valid, check target for redirections
+                tgtId = targetData.getRedirectedId(srcId);
+                if (tgtId == srcId) {
+                    type = MappedType.REDIRECTED_CYCLE;
                 } else {
-                    // if not any of above, check whether it has been updated/unchanged!
-                    tgtTitle = targetData.getTitle(srcId);
-                    if (!srcTitle.equals(tgtTitle)) {
-                        type = MappedType.UPDATED;
-                    } else {
-                        // A valid source id that is not deleted, updated, redirected or disambiguated in target is an Unchanged entry
-                        type = MappedType.UNCHANGED;
-                    }
+                    type = MappedType.REDIRECTED;
+                }
+
+                tgtTitle = targetData.getTitle(tgtId);
+                logger_.debug(srcTitle + "(" + srcId + ") redirects to : " + tgtTitle + "(" + tgtId + ")");
+            } else if (targetData.isDisambiguation(srcId)) {
+                // not a redirection, verifying for disambiguation
+                int redirectedId = srcId;
+                if (sourceData.isRedirect(srcId)) {
+                    type = MappedType.REDIRECTED_DISAMBIGUATED;
+                    redirectedId = sourceData.getRedirectedId(srcId);
+                } else {
+                    type = MappedType.DISAMBIGUATED;
+                }
+                tgtId = targetData.getDisambiguatedId(srcId, sourceData.getPageLinks(redirectedId));
+                tgtTitle = targetData.getTitle(tgtId);
+                srcText = sourceData.getPageText(srcId);
+                tgtText = targetData.getPageText(tgtId);
+                logger_.info(srcTitle + "(" + srcId + ") disambiguates to : " + tgtTitle + "(" + tgtId + ")");
+            } else if (!targetData.hasId(srcId)) {
+                type = MappedType.DELETED;
+                tgtTitle = null;
+                tgtId = -1;
+            } else {
+                // if not any of above, check whether it has been updated/unchanged!
+                tgtTitle = targetData.getTitle(srcId);
+                if (!srcTitle.equals(tgtTitle)) {
+                    type = MappedType.UPDATED;
+                } else {
+                    // A valid source id that is not deleted, updated, redirected or disambiguated in target is an Unchanged entry
+                    type = MappedType.UNCHANGED;
                 }
             }
             results.add(new MappedResult(srcId, srcTitle, srcText, tgtId, tgtTitle, tgtText, type));
