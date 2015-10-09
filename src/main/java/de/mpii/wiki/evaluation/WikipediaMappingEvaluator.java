@@ -36,7 +36,7 @@ public class WikipediaMappingEvaluator {
             System.out.println("Usage: WikipediaMappingEvaluator <resultFile>");
             System.exit(1);
         }
-        File resultFile = new File(args[1]);
+        File resultFile = new File(args[0]);
 
         System.out.format("Start reading '%s' ...\n", resultFile.getName());
         List<MappedResult> results = MappingResultReader.read(resultFile);
