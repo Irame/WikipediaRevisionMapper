@@ -31,6 +31,7 @@ public class MappingResultReader {
         String tgtTitle = null;
         String tgtText = null;
 
+        int entriesProcessed = 0;
         while (reader.hasNext()) {
             XMLEvent event = reader.nextEvent();
 
@@ -66,6 +67,8 @@ public class MappingResultReader {
             } else if (event.isEndElement()) {
                 if (event.asEndElement().getName().getLocalPart().equals(WikipediaRevisionMapper.EVAL_XML_ENTRY_TAG)) {
                     results.add(new MappedResult(srcId, srcTitle, srcText, tgtId, tgtTitle ,tgtText, mappedType));
+                    if (++entriesProcessed % 100_000 == 0)
+                        System.out.format("Entries processed: %d k\n", entriesProcessed/1000);
                 }
             }
         }
