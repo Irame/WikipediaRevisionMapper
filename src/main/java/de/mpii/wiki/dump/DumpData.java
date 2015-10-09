@@ -47,8 +47,7 @@ public class DumpData {
     // Stores link on a Wikipedia article
     private TIntObjectMap<TIntList> articleLinks;
 
-    // number of page entries processed
-    private int processedPages = 0;
+    private TIntObjectMap<String> pageText;
 
     private static Logger logger_ = LoggerFactory.getLogger(DumpData.class);
 
@@ -59,6 +58,8 @@ public class DumpData {
         disambiguations = new TIntObjectHashMap<>();
         redirections = new TIntObjectHashMap<>();
         articleLinks = new TIntObjectHashMap<>();
+
+        pageText = new TIntObjectHashMap<>();
     }
 
     public DumpData(DumpType dType) {
@@ -79,12 +80,18 @@ public class DumpData {
 
         // store disambiguation only for target dump
         TIntList links = extractLinks(content);
-        if (dumpType == DumpType.TARGET && pageType == PageType.DISAMBIGUATION) {
+        if (dumpType.isTarget() && pageType == PageType.DISAMBIGUATION) {
             disambiguations.put(id, links);
         } else if (pageType == PageType.ARTICLE) {
             articleLinks.put(id, links);
         } else if (pageType == PageType.REDIRECT) {
             redirections.put(id, links);
+        }
+
+        if (dumpType.isEval() && (
+                (dumpType.isTarget() && pageType == PageType.DISAMBIGUATION)
+             || (dumpType.isSource() && pageType == PageType.ARTICLE))) {
+            pageText.put(id, content);
         }
     }
 
@@ -126,6 +133,9 @@ public class DumpData {
         return idTitleMap.containsKey(id);
     }
 
+    public String getPageText(int id) {
+        return pageText.get(id);
+    }
 
     private int disambiguate(int srcPageId, TIntList srcPageLinks) {
         TIntList tgtPageDisambiguationLinks = disambiguations.get(srcPageId);

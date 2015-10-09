@@ -1,15 +1,20 @@
 package de.mpii.wiki;
 
+import de.mpii.wiki.result.MappedResult;
+import de.mpii.wiki.result.MappedType;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.xml.stream.XMLStreamException;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -86,6 +91,9 @@ public class WikipediaRevisionMapperTest {
         assertEquals(1, hshResults.size());
         assertEquals(true, hshResults.containsKey("Test2"));
         assertEquals("NEW_Test2", hshResults.get("Test2"));
+
+        tmpSrcDump.delete();
+        tmpTargetDump.delete();
     }
 
     @Test
@@ -129,6 +137,9 @@ public class WikipediaRevisionMapperTest {
         Map<String, String> hshResults = WikipediaRevisionMapper.map(tmpSrcDump, tmpTargetDump);
         assertEquals(true, hshResults.containsKey("Test2"));
         assertEquals(null, hshResults.get("Test2"));
+
+        tmpSrcDump.delete();
+        tmpTargetDump.delete();
     }
 
     @Test
@@ -183,6 +194,9 @@ public class WikipediaRevisionMapperTest {
         Map<String, String> hshResults = WikipediaRevisionMapper.map(tmpOldDump, tmpNewDump);
         assertEquals(3, hshResults.size());
         assertEquals("Test3", hshResults.get("Test1"));
+
+        tmpNewDump.delete();
+        tmpOldDump.delete();
     }
 
     @Test
@@ -300,6 +314,9 @@ public class WikipediaRevisionMapperTest {
         assertEquals("Test6", hshResults.get("Test3"));
 
         assertEquals("NEW_Test2", hshResults.get("Test2"));
+
+        tmpSrcDump.delete();
+        tmpTargetDump.delete();
     }
 
     @Test
@@ -356,6 +373,9 @@ public class WikipediaRevisionMapperTest {
         assertEquals(3, hshResults.size());
         // Test1 REDIRECTS TO Test3, but since it forms a cycle, Test1 is mapped to itself
         assertEquals(true, !hshResults.get("Test1").equals("Test3"));
+
+        tmpSrcDump.delete();
+        tmpTargetDump.delete();
     }
 
     //@Ignore("score computation not implemented yet")
@@ -376,5 +396,50 @@ public class WikipediaRevisionMapperTest {
         hshResults = WikipediaRevisionMapper.map(tmpSrcDump, tmpTargetDump, false);
         // assertEquals(1, hshResults.size());
         assertEquals("Albert Einstein", hshResults.get("Einstein"));
+    }
+
+    @Test
+    public void testWriteToXMLFile() throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        File tmpFile = File.createTempFile("wikiMapperXMLTest", ".xml");
+        List<MappedResult> results = new ArrayList<>();
+        results.add(new MappedResult(1, "Test1", null, 1, "Test1", null, MappedType.UNCHANGED));
+        results.add(new MappedResult(2, "Test2", null, 22, "Test22", null, MappedType.DISAMBIGUATED));
+        results.add(new MappedResult(3, "Test3", null, 3, "Test3a", null, MappedType.UPDATED));
+
+        String expectedContent =
+                "<?xml version=\"1.0\" ?>" +
+                "<MappingResult>" +
+                    "<Entry>" +
+                        "<MappingType>UNCHANGED</MappingType>" +
+                        "<SourceId>1</SourceId>" +
+                        "<SourceTitle>Test1</SourceTitle>" +
+                        "<TargetId>1</TargetId>" +
+                        "<TargetTitle>Test1</TargetTitle>" +
+                    "</Entry>" +
+                    "<Entry>" +
+                        "<MappingType>DISAMBIGUATED</MappingType>" +
+                        "<SourceId>2</SourceId>" +
+                        "<SourceTitle>Test2</SourceTitle>" +
+                        "<TargetId>22</TargetId>" +
+                        "<TargetTitle>Test22</TargetTitle>" +
+                    "</Entry>" +
+                    "<Entry>" +
+                        "<MappingType>UPDATED</MappingType>" +
+                        "<SourceId>3</SourceId>" +
+                        "<SourceTitle>Test3</SourceTitle>" +
+                        "<TargetId>3</TargetId>" +
+                        "<TargetTitle>Test3a</TargetTitle>" +
+                    "</Entry>" +
+                "</MappingResult>";
+
+        Method method = WikipediaRevisionMapper.class.getDeclaredMethod("writeFileContentAsXML", File.class, List.class);
+        method.setAccessible(true);
+        method.invoke(null, tmpFile, results);
+
+        String fileContent = new String(Files.readAllBytes(Paths.get(tmpFile.getAbsolutePath())), new FileReader(tmpFile).getEncoding());
+
+        assertEquals(expectedContent, fileContent);
+
+        tmpFile.delete();
     }
 }

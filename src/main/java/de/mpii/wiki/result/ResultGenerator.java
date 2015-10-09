@@ -20,6 +20,9 @@ public class ResultGenerator {
             String srcTitle;
             String tgtTitle;
 
+            String srcText = null;
+            String tgtText = null;
+
             srcTitle = sourceData.getTitle(srcId);
             
             boolean redirectedSource = false;
@@ -58,7 +61,8 @@ public class ResultGenerator {
                     }
                     tgtId = targetData.getDisambiguatedId(srcId, sourceData.getPageLinks(srcId));
                     tgtTitle = targetData.getTitle(tgtId);
-
+                    srcText = sourceData.getPageText(srcId);
+                    tgtText = targetData.getPageText(tgtId);
                     logger_.info(srcTitle + "(" + srcId + ") disambiguates to : " + tgtTitle + "(" + tgtId + ")");
                 } else if (!targetData.hasId(srcId)) {
                     type = MappedType.DELETED;
@@ -75,7 +79,7 @@ public class ResultGenerator {
                     }
                 }
             }
-            results.add(new MappedResult(srcId, srcTitle, tgtId, tgtTitle, type));
+            results.add(new MappedResult(srcId, srcTitle, srcText, tgtId, tgtTitle, tgtText, type));
         }
         return results;
     }

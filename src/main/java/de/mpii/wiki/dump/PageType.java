@@ -1,7 +1,7 @@
 package de.mpii.wiki.dump;
 
 public enum PageType {
-    ARTICLE(false), REDIRECT(true), DISAMBIGUATION(true);
+    ARTICLE, REDIRECT, DISAMBIGUATION;
 
     private boolean isSpecialPage;
 
@@ -33,10 +33,6 @@ public enum PageType {
             "#REDIRECT"
     };
 
-    PageType(boolean isSpecialPage) {
-        this.isSpecialPage = isSpecialPage;
-    }
-
     public static PageType parseFrom(String title, String text) {
         if (!(text == null || text.isEmpty()) && containsAny(text, REDIRECT_TERMS))
             return REDIRECT;
@@ -53,9 +49,5 @@ public enum PageType {
             }
         }
         return false;
-    }
-
-    public boolean isSpecialPage() {
-        return isSpecialPage;
     }
 }

@@ -8,6 +8,7 @@ import javax.xml.stream.XMLStreamException;
 import java.io.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 
 public class DumpReaderTest {
@@ -57,7 +58,6 @@ public class DumpReaderTest {
         DumpData dumpData = new DumpData(DumpType.TARGET);
 
         DumpReader.read(tmpDump, dumpData);
-        DumpReader.read(tmpDump, dumpData);
 
         assertEquals(4, dumpData.size());
 
@@ -65,12 +65,14 @@ public class DumpReaderTest {
         assertEquals(true, dumpData.isArticle(2));
         assertEquals(false, dumpData.isArticle(3));
 
-        // Redirects and disambiguation are processed only for Target Dump Type
-
         assertEquals(true, dumpData.isRedirect(3));
         assertEquals(1, dumpData.getRedirectedId(3));
 
+        // disambiguation are processed only for Target Dump Type
+
         assertEquals(true, dumpData.isDisambiguation(4));
+
+        tmpDump.delete();
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -119,20 +121,19 @@ public class DumpReaderTest {
         DumpData dumpData = new DumpData(DumpType.SOURCE);
 
         DumpReader.read(tmpDump, dumpData);
-        DumpReader.read(tmpDump, dumpData);
 
         assertEquals(4, dumpData.size());
 
         assertEquals(true, dumpData.isArticle(1));
         assertEquals(true, dumpData.isArticle(2));
 
-        // redirects and disambiguations are not processed for source dump
+        assertEquals(1, dumpData.getRedirectedId(3));
+        assertEquals(true, dumpData.isRedirect(3));
+
+        // disambiguations are not processed for source dump
         assertEquals(false, dumpData.isArticle(3));
         assertEquals(false, dumpData.isArticle(4));
 
-        assertEquals(null, dumpData.getPageLinks(3));
-
-        assertEquals(false, dumpData.isRedirect(3));
         assertEquals(false, dumpData.isDisambiguation(4));
 
         // remove tmp files
