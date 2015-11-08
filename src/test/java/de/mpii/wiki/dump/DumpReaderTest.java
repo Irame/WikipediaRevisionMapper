@@ -2,13 +2,10 @@ package de.mpii.wiki.dump;
 
 import org.junit.Test;
 
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 
 public class DumpReaderTest {
@@ -134,7 +131,7 @@ public class DumpReaderTest {
         assertEquals(false, dumpData.isArticle(3));
         assertEquals(false, dumpData.isArticle(4));
 
-        assertEquals(false, dumpData.isDisambiguation(4));
+        assertEquals(true, dumpData.isDisambiguation(4));
 
         // remove tmp files
         tmpDump.delete();

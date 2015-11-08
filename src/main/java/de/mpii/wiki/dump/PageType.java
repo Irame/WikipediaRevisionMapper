@@ -3,8 +3,6 @@ package de.mpii.wiki.dump;
 public enum PageType {
     ARTICLE, REDIRECT, DISAMBIGUATION;
 
-    private boolean isSpecialPage;
-
     private static final String[] DISAMBIGUATION_TERMS = new String[] {
             "{{Disambig}}","{{Airport_disambig}}","{{Battledist}}",
             "{{Callsigndis}}","{{Chemistry disambiguation}}",
@@ -25,7 +23,7 @@ public enum PageType {
     };
 
     private static final String[] TITLE_DISAMBIGUATION_TERMS = new String[] {
-        "(Disambiguation)", "(Surname)", "(Given name)", "(Name)"
+        "(disambiguation)", "(Surname)", "(Given name)", "(Name)"
     };
 
 
@@ -43,8 +41,9 @@ public enum PageType {
     }
 
     private static boolean containsAny(String text, String[] words) {
+        String lowerCaseText = text.toLowerCase();
         for(String ele : words) {
-            if(text.contains(ele) || text.contains(ele.toLowerCase())) {
+            if(lowerCaseText.contains(ele.toLowerCase())) {
                 return true;
             }
         }

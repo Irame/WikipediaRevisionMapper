@@ -80,7 +80,7 @@ public class DumpData {
 
         // store disambiguation only for target dump
         TIntList links = extractLinks(content);
-        if (dumpType.isTarget() && pageType == PageType.DISAMBIGUATION) {
+        if (pageType == PageType.DISAMBIGUATION) {
             disambiguations.put(id, links);
         } else if (pageType == PageType.ARTICLE) {
             articleLinks.put(id, links);
@@ -140,7 +140,7 @@ public class DumpData {
     private int disambiguate(int srcPageId, TIntList srcPageLinks) {
         TIntList tgtPageDisambiguationLinks = disambiguations.get(srcPageId);
 
-        double maxScore = 0.0;
+        double maxScore = -1.0;
         int result = srcPageId; // return the current pageId, if no disambiguations are found
 
         if (tgtPageDisambiguationLinks == null || tgtPageDisambiguationLinks.isEmpty())

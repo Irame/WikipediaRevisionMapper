@@ -25,15 +25,16 @@ public class ResultGenerator {
 
             srcTitle = sourceData.getTitle(srcId);
 
-            if (sourceData.isDisambiguation(srcId)) {
-                // Source entry is either redirect/disambiguation and ignored
-                type = MappedType.SOURCE_IGNORED;
-                if (targetData.hasId(srcId)) {
-                    tgtTitle = targetData.getTitle(srcId);
-                } else {
-                    tgtTitle = srcTitle;
-                }
-            } else if (targetData.isRedirect(srcId)) {
+//            if (sourceData.isDisambiguation(srcId)) {
+//                // Source entry is either redirect/disambiguation and ignored
+//                type = MappedType.SOURCE_IGNORED;
+//                if (targetData.hasId(srcId)) {
+//                    tgtTitle = targetData.getTitle(srcId);
+//                } else {
+//                    tgtTitle = srcTitle;
+//                }
+//            } else 
+            if (!sourceData.isRedirect(srcId) && targetData.isRedirect(srcId)) {
                 // source id is valid, check target for redirections
                 tgtId = targetData.getRedirectedId(srcId);
                 if (tgtId == srcId) {
@@ -44,19 +45,22 @@ public class ResultGenerator {
 
                 tgtTitle = targetData.getTitle(tgtId);
                 logger_.debug(srcTitle + "(" + srcId + ") redirects to : " + tgtTitle + "(" + tgtId + ")");
-            } else if (targetData.isDisambiguation(srcId)) {
+            } else if (!sourceData.isDisambiguation(srcId) && targetData.isDisambiguation(srcId)) {
                 // not a redirection, verifying for disambiguation
                 int redirectedId = srcId;
                 if (sourceData.isRedirect(srcId)) {
-                    type = MappedType.REDIRECTED_DISAMBIGUATED;
                     redirectedId = sourceData.getRedirectedId(srcId);
+                    if (redirectedId == srcId) 
+                        type = MappedType.REDIRECTED_CYCLE_DISAMBIGUATED;
+                    else
+                        type = MappedType.REDIRECTED_DISAMBIGUATED;
                 } else {
                     type = MappedType.DISAMBIGUATED;
                 }
                 tgtId = targetData.getDisambiguatedId(srcId, sourceData.getPageLinks(redirectedId));
                 tgtTitle = targetData.getTitle(tgtId);
-                srcText = sourceData.getPageText(srcId);
-                tgtText = targetData.getPageText(tgtId);
+                srcText = sourceData.getPageText(redirectedId);
+                tgtText = targetData.getPageText(srcId);
                 logger_.info(srcTitle + "(" + srcId + ") disambiguates to : " + tgtTitle + "(" + tgtId + ")");
             } else if (!targetData.hasId(srcId)) {
                 type = MappedType.DELETED;

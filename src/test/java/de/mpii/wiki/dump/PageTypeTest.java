@@ -28,8 +28,15 @@ public class PageTypeTest {
     }
 
     @Test
-    public void identifyRedirectPageFromContent() {
+    public void identifyRedirectPageFromContent1() {
         PageType pageType = PageType.parseFrom("Test", "#REDIRECT [[Test3]] {{R from CamelCase}}");
+
+        assertEquals(PageType.REDIRECT, pageType);
+    }
+    
+    @Test
+    public void identifyRedirectPageFromContent2() {
+        PageType pageType = PageType.parseFrom("Test", "#Redirect [[Robert A. Dressler]]");
 
         assertEquals(PageType.REDIRECT, pageType);
     }

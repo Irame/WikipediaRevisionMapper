@@ -8,9 +8,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
-/**
- * Created by Felix on 09.10.2015.
- */
 public class WikipediaMappingEvaluator {
 
     /**
@@ -30,6 +27,10 @@ public class WikipediaMappingEvaluator {
                 * Math.sqrt((p * (1 - p) + 1 / 4.0 / total * z * z) / total)
                 / (1 + 1.0 / total * z * z);
         return (new double[] { center, d });
+    }
+    
+    private static String capString(String s, int length) {
+        return s.length() > length ? s.substring(0, length) : s;
     }
 
     public static void main(String[] args) throws FileNotFoundException, XMLStreamException {
@@ -58,38 +59,44 @@ public class WikipediaMappingEvaluator {
         Set<String> declineInput = new HashSet<>(Arrays.asList("no", "n", "-"));
 
         double[] wilsonResult;
-
+        int counter = 0;
         Random random = new Random(System.currentTimeMillis());
         Scanner scanner = new Scanner(System.in);
-        System.out.format(">> START (file: %s) <<<\n", resultFile.getAbsolutePath());
+        System.out.format(">>>> START (file: %s)\n", resultFile.getAbsolutePath());
         do {
             MappedResult curMappedResult = results.remove(random.nextInt(results.size()));
+            System.out.format(">>> Evaluating Entry: %d\n", ++counter);
+            
+            String srcText = curMappedResult.getSourceText();
+            if (srcText != null)
+                System.out.format(">> Source Text:\n%s\n", capString(srcText, 1000));
+            
+            String tgtText = curMappedResult.getTargetText();
+            if (tgtText != null)
+                System.out.format(">> Target Text:\n%s\n", capString(tgtText, 1000));
+            
             System.out.format(
-                    ">>> MappingType: %s\n" +
-                    ">>> Ids: %d => %d\n" +
-                    ">>> Titles: '%s' => '%s'\n",
+                    ">> MappingType: %s\n" +
+                    ">> Ids: %d => %d\n" +
+                    ">> Titles: '%s' => '%s'\n",
                     curMappedResult.getMappingType(),
                     curMappedResult.getSourceId(), curMappedResult.getTargetId(),
                     curMappedResult.getSourceTitle(), curMappedResult.getTargetTitle());
-            if (curMappedResult.getSourceText() != null)
-                System.out.format(">>> Source Text:\n%s\n", curMappedResult.getSourceText());
-            if (curMappedResult.getTargetText() != null)
-                System.out.format(">>> Target Text:\n%s\n", curMappedResult.getTargetText());
-
-            System.out.println(">>> Is this mapping correct?");
+            
+            System.out.println("> Is this mapping correct?");
             String userInput = scanner.next();
             if (acceptInput.contains(userInput.toLowerCase())) {
                 correctResults.add(curMappedResult);
-                System.out.println(">>> Tagged as CORRECT");
+                System.out.println(">> Tagged as CORRECT");
             } else if (declineInput.contains(userInput.toLowerCase())) {
                 incorrectResults.add(curMappedResult);
-                System.out.println(">>> Tagged as INCORRECT");
+                System.out.println(">> Tagged as INCORRECT");
             } else {
-                System.out.println(">>> Skipped");
+                System.out.println(">> Skipped");
             }
             wilsonResult = wilson(correctResults.size() + incorrectResults.size(), correctResults.size());
-            System.out.format(">>> Wilson Intervall: Center = %.2f, Distance = %.2f\n", wilsonResult[0], wilsonResult[1]);
-        } while (wilsonResult[1] > 0.05);
-        System.out.println(">>> DONE <<<");
+            System.out.format(">> Wilson Intervall: Center = %.2f%%, Distance = %.2f%%\n", wilsonResult[0]*100, wilsonResult[1]*100);
+        } while (correctResults.size() + incorrectResults.size() == 0 || wilsonResult[1] > 0.05);
+        System.out.println(">>>> DONE");
     }
 }
