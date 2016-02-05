@@ -4,6 +4,8 @@ import de.mpii.wiki.FileUtils;
 import de.mpii.wiki.result.MappedResult;
 import de.mpii.wiki.result.MappedType;
 import org.apache.commons.cli.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.text.ParseException;
@@ -11,6 +13,8 @@ import java.util.*;
 
 public class WikipediaMappingEvaluator {
 
+    private static Logger logger = LoggerFactory.getLogger(WikipediaMappingEvaluator.class);
+    
     /**
      * Computes the Wilson Interval (see
      * http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval
@@ -62,12 +66,6 @@ public class WikipediaMappingEvaluator {
             .hasArg()
             .withArgName("OUTPUT_CORRECT_FILE")
             .create("oc"));
-//        options.addOption(OptionBuilder
-//            .withLongOpt("log")
-//            .withDescription("Log output file")
-//            .hasArg()
-//            .withArgName("LOG_FILE")
-//            .create("l"));
         options.addOption(OptionBuilder.withLongOpt("help").create('h'));
         return options;
     }
@@ -108,10 +106,6 @@ public class WikipediaMappingEvaluator {
             typesToEvaluate = new HashSet<>(Arrays.asList(MappedType.values()));
         }
 
-//        File logFile = null;
-//        if (cmd.hasOption("l"))
-//            logFile = new File(cmd.getOptionValue("l"));
-
         File correctOutFile = null;
         if (cmd.hasOption("oc"))
             correctOutFile = new File(cmd.getOptionValue("oc"));
@@ -120,9 +114,9 @@ public class WikipediaMappingEvaluator {
         if (cmd.hasOption("oi"))
             incorrectOutFile = new File(cmd.getOptionValue("oi"));
 
-        System.out.format("Start reading '%s' ...\n", resultFile.getName());
+        logger.info("Start reading '%s' ...", resultFile.getName());
         List<MappedResult> results = MappingResultReader.read(resultFile, typesToEvaluate);
-        System.out.format("Finished reading '%s'!\n", resultFile.getName());
+        logger.info("Finished reading '%s'!", resultFile.getName());
         List<MappedResult> correctResults = new ArrayList<>();
         List<MappedResult> incorrectResults = new ArrayList<>();
 
@@ -133,40 +127,36 @@ public class WikipediaMappingEvaluator {
         int counter = 0;
         Random random = new Random(System.currentTimeMillis());
         Scanner scanner = new Scanner(System.in);
-        System.out.format(">>>> START (file: %s)\n", resultFile.getAbsolutePath());
+        logger.info(">>>> START (file: %s)", resultFile.getAbsolutePath());
         do {
             MappedResult curMappedResult = results.remove(random.nextInt(results.size()));
-            System.out.format(">>> Evaluating Entry: %d\n", ++counter);
+            logger.info(">>> Evaluating Entry: %d", ++counter);
             
             String srcText = curMappedResult.getSourceText();
             if (srcText != null)
-                System.out.format(">> Source Text:\n%s\n", capString(srcText, 1000));
+                logger.info(">> Source Text: %s", capString(srcText, 1000));
             
             String tgtText = curMappedResult.getTargetText();
             if (tgtText != null)
-                System.out.format(">> Target Text:\n%s\n", capString(tgtText, 1000));
+                logger.info(">> Target Text: %s", capString(tgtText, 1000));
             
-            System.out.format(
-                    ">> MappingType: %s\n" +
-                    ">> Ids: %d => %d\n" +
-                    ">> Titles: '%s' => '%s'\n",
-                    curMappedResult.getMappingType(),
-                    curMappedResult.getSourceId(), curMappedResult.getTargetId(),
-                    curMappedResult.getSourceTitle(), curMappedResult.getTargetTitle());
+            logger.info(">> MappingType: %s", curMappedResult.getMappingType());
+            logger.info(">> Ids: %d => %d", curMappedResult.getSourceId(), curMappedResult.getTargetId());
+            logger.info(">> Titles: '%s' => '%s'", curMappedResult.getSourceTitle(), curMappedResult.getTargetTitle());
             
-            System.out.println("> Is this mapping correct?");
+            logger.info("> Is this mapping correct?");
             String userInput = scanner.next();
             if (acceptInput.contains(userInput.toLowerCase())) {
                 correctResults.add(curMappedResult);
-                System.out.println(">> Tagged as CORRECT");
+                logger.info(">> Tagged as CORRECT");
             } else if (declineInput.contains(userInput.toLowerCase())) {
                 incorrectResults.add(curMappedResult);
-                System.out.println(">> Tagged as INCORRECT");
+                logger.info(">> Tagged as INCORRECT");
             } else {
-                System.out.println(">> Skipped");
+                logger.info(">> Skipped");
             }
             wilsonResult = wilson(correctResults.size() + incorrectResults.size(), correctResults.size());
-            System.out.format(">> Wilson Intervall: Center = %.2f%%, Distance = %.2f%%\n", wilsonResult[0]*100, wilsonResult[1]*100);
+            logger.info(">> Wilson Intervall: Center = %.2f%%, Distance = %.2f%%", wilsonResult[0]*100, wilsonResult[1]*100);
         } while (correctResults.size() + incorrectResults.size() == 0 || wilsonResult[1] > 0.05);
         
         if (correctOutFile != null)
@@ -175,6 +165,6 @@ public class WikipediaMappingEvaluator {
         if (incorrectOutFile != null)
             FileUtils.writeFileContent(incorrectOutFile, incorrectResults);
         
-        System.out.println(">>>> DONE");
+        logger.info(">>>> DONE");
     }
 }
