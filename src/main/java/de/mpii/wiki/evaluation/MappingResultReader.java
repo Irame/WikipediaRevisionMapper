@@ -1,6 +1,6 @@
 package de.mpii.wiki.evaluation;
 
-import de.mpii.wiki.WikipediaRevisionMapper;
+import de.mpii.wiki.FileUtils;
 import de.mpii.wiki.result.MappedResult;
 import de.mpii.wiki.result.MappedType;
 
@@ -38,7 +38,7 @@ public class MappingResultReader {
             XMLEvent event = reader.nextEvent();
             if (event.isStartElement()) {
                 elementName = event.asStartElement().getName().getLocalPart();
-                if (elementName.equals(WikipediaRevisionMapper.EVAL_XML_ENTRY_TAG)) {
+                if (elementName.equals(FileUtils.EVAL_XML_ENTRY_TAG)) {
                     mappedType = null;
                     srcId = -1;
                     srcTitle = null;
@@ -52,24 +52,24 @@ public class MappingResultReader {
             } else if (event.isCharacters()) {
                 if (elementName == null) continue;
                 String content = event.asCharacters().getData();
-                if (elementName.equals(WikipediaRevisionMapper.EVAL_XML_MAPPING_TYPE_TAG)) {
+                if (elementName.equals(FileUtils.EVAL_XML_MAPPING_TYPE_TAG)) {
                     mappedType = MappedType.valueOf(content);
-                } else if (elementName.equals(WikipediaRevisionMapper.EVAL_XML_SOURCE_ID_TAG)) {
+                } else if (elementName.equals(FileUtils.EVAL_XML_SOURCE_ID_TAG)) {
                     srcId = Integer.parseInt(content);
-                } else if (elementName.equals(WikipediaRevisionMapper.EVAL_XML_SOURCE_TITLE_TAG)) {
+                } else if (elementName.equals(FileUtils.EVAL_XML_SOURCE_TITLE_TAG)) {
                     srcTitle = content;
-                } else if (elementName.equals(WikipediaRevisionMapper.EVAL_XML_SOURCE_TEXT_TAG)) {
+                } else if (elementName.equals(FileUtils.EVAL_XML_SOURCE_TEXT_TAG)) {
                     srcText.append(content);
-                } else if (elementName.equals(WikipediaRevisionMapper.EVAL_XML_TARGET_ID_TAG)) {
+                } else if (elementName.equals(FileUtils.EVAL_XML_TARGET_ID_TAG)) {
                     tgtId = Integer.parseInt(content);
-                } else if (elementName.equals(WikipediaRevisionMapper.EVAL_XML_TARGET_TITLE_TAG)) {
+                } else if (elementName.equals(FileUtils.EVAL_XML_TARGET_TITLE_TAG)) {
                     tgtTitle = content;
-                } else if (elementName.equals(WikipediaRevisionMapper.EVAL_XML_TARGET_TEXT_TAG)) {
+                } else if (elementName.equals(FileUtils.EVAL_XML_TARGET_TEXT_TAG)) {
                     tgtText.append(content);
                 }
             } else if (event.isEndElement()) {
                 elementName = null;
-                if (event.asEndElement().getName().getLocalPart().equals(WikipediaRevisionMapper.EVAL_XML_ENTRY_TAG)) {
+                if (event.asEndElement().getName().getLocalPart().equals(FileUtils.EVAL_XML_ENTRY_TAG)) {
                     results.add(new MappedResult(srcId, srcTitle, srcText.length() == 0 ? null : srcText.toString(), tgtId, tgtTitle, tgtText.length() == 0 ? null : tgtText.toString(), mappedType));
                     if (++entriesProcessed % 100_000 == 0)
                         System.out.format("Entries processed: %d k\n", entriesProcessed/1000);

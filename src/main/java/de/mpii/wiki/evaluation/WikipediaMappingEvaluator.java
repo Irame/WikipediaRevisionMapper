@@ -1,11 +1,12 @@
 package de.mpii.wiki.evaluation;
 
+import de.mpii.wiki.FileUtils;
 import de.mpii.wiki.result.MappedResult;
 import de.mpii.wiki.result.MappedType;
+import org.apache.commons.cli.*;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.text.ParseException;
 import java.util.*;
 
 public class WikipediaMappingEvaluator {
@@ -33,21 +34,91 @@ public class WikipediaMappingEvaluator {
         return s.length() > length ? s.substring(0, length) : s;
     }
 
-    public static void main(String[] args) throws FileNotFoundException, XMLStreamException {
-        if (args.length < 1 || args.length > 2) {
-            System.out.println("Usage: WikipediaMappingEvaluator <resultFile> [<mappedType>]");
-            System.exit(1);
+    @SuppressWarnings("AccessStaticViaInstance")
+    private static Options buildCommandLineOptions() throws ParseException {
+        Options options = new Options();
+        options.addOption(OptionBuilder
+            .withLongOpt("input")
+            .withDescription("Mapping results to evaluate")
+            .hasArg()
+            .isRequired()
+            .withArgName("INPUT_FILE")
+            .create("i"));
+        options.addOption(OptionBuilder
+            .withLongOpt("types")
+            .withDescription("Mapping types to evaluate")
+            .hasArg()
+            .withArgName("MAPPING_TYPES")
+            .create("t"));
+        options.addOption(OptionBuilder
+            .withLongOpt("output-incorrect")
+            .withDescription("Output file for incorrect mappings")
+            .hasArg()
+            .withArgName("OUTPUT_INCORRECT_FILE")
+            .create("oi"));
+        options.addOption(OptionBuilder
+            .withLongOpt("output-correct")
+            .withDescription("Output file for correct mappings")
+            .hasArg()
+            .withArgName("OUTPUT_CORRECT_FILE")
+            .create("oc"));
+//        options.addOption(OptionBuilder
+//            .withLongOpt("log")
+//            .withDescription("Log output file")
+//            .hasArg()
+//            .withArgName("LOG_FILE")
+//            .create("l"));
+        options.addOption(OptionBuilder.withLongOpt("help").create('h'));
+        return options;
+    }
+    
+    private static void printHelp(Options commandLineOptions) {
+        String header = "\n\nWikipediaRevisionMapperEvaluator:\n\n";
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("WikiTools", header,
+            commandLineOptions, "", true);
+        System.exit(0);
+    }
+    
+    public static void main(String[] args) throws Exception {
+        Options commandLineOptions = buildCommandLineOptions();
+        CommandLineParser parser = new PosixParser();
+        CommandLine cmd;
+
+        try {
+            cmd = parser.parse(commandLineOptions, args);
+        } catch (MissingOptionException e) {
+            System.out.println("\n\n" + e + "\n\n");
+            printHelp(commandLineOptions);
+            return;
         }
-        File resultFile = new File(args[0]);
+        if (cmd.hasOption("h")) {
+            printHelp(commandLineOptions);
+        }
+        
+        File resultFile = new File(cmd.getOptionValue("i"));
+        
         Set<MappedType> typesToEvaluate;
-        if (args.length == 2) {
+        if (cmd.hasOption("t")) {
             typesToEvaluate = new HashSet<>();
-            for (String typeString : args[1].split(",")) {
+            for (String typeString : cmd.getOptionValue("t").split(",")) {
                 typesToEvaluate.add(MappedType.valueOf(typeString));
             }
         } else {
             typesToEvaluate = new HashSet<>(Arrays.asList(MappedType.values()));
         }
+
+//        File logFile = null;
+//        if (cmd.hasOption("l"))
+//            logFile = new File(cmd.getOptionValue("l"));
+
+        File correctOutFile = null;
+        if (cmd.hasOption("oc"))
+            correctOutFile = new File(cmd.getOptionValue("oc"));
+
+        File incorrectOutFile = null;
+        if (cmd.hasOption("oi"))
+            incorrectOutFile = new File(cmd.getOptionValue("oi"));
 
         System.out.format("Start reading '%s' ...\n", resultFile.getName());
         List<MappedResult> results = MappingResultReader.read(resultFile, typesToEvaluate);
@@ -97,6 +168,13 @@ public class WikipediaMappingEvaluator {
             wilsonResult = wilson(correctResults.size() + incorrectResults.size(), correctResults.size());
             System.out.format(">> Wilson Intervall: Center = %.2f%%, Distance = %.2f%%\n", wilsonResult[0]*100, wilsonResult[1]*100);
         } while (correctResults.size() + incorrectResults.size() == 0 || wilsonResult[1] > 0.05);
+        
+        if (correctOutFile != null)
+            FileUtils.writeFileContent(correctOutFile, correctResults);
+        
+        if (incorrectOutFile != null)
+            FileUtils.writeFileContent(incorrectOutFile, incorrectResults);
+        
         System.out.println(">>>> DONE");
     }
 }
