@@ -109,10 +109,14 @@ public class WikipediaMappingEvaluator {
         File correctOutFile = null;
         if (cmd.hasOption("oc"))
             correctOutFile = new File(cmd.getOptionValue("oc"));
+        else
+            correctOutFile = new File(resultFile.getParentFile(), resultFile.getName() + ".correct");
 
         File incorrectOutFile = null;
         if (cmd.hasOption("oi"))
             incorrectOutFile = new File(cmd.getOptionValue("oi"));
+        else
+            incorrectOutFile = new File(resultFile.getParentFile(), resultFile.getName() + ".incorrect");
 
         logger.info("Start reading '{}' ...", resultFile.getName());
         List<MappedResult> results = MappingResultReader.read(resultFile, typesToEvaluate);
@@ -124,6 +128,9 @@ public class WikipediaMappingEvaluator {
         Set<String> declineInput = new HashSet<>(Arrays.asList("no", "n", "-"));
 
         double[] wilsonResult;
+        List<MappedResult> curResultAsList = new ArrayList<MappedResult>(1){{
+            add(null);
+        }};
         int counter = 0;
         Random random = new Random(System.currentTimeMillis());
         Scanner scanner = new Scanner(System.in);
@@ -146,11 +153,14 @@ public class WikipediaMappingEvaluator {
             
             logger.info("> Is this mapping correct?");
             String userInput = scanner.next();
+            curResultAsList.set(0, curMappedResult);
             if (acceptInput.contains(userInput.toLowerCase())) {
                 correctResults.add(curMappedResult);
+                FileUtils.writeFileContent(correctOutFile, curResultAsList);
                 logger.info(">> Tagged as CORRECT");
             } else if (declineInput.contains(userInput.toLowerCase())) {
                 incorrectResults.add(curMappedResult);
+                FileUtils.writeFileContent(incorrectOutFile, curResultAsList);
                 logger.info(">> Tagged as INCORRECT");
             } else {
                 logger.info(">> Skipped");
@@ -158,12 +168,6 @@ public class WikipediaMappingEvaluator {
             wilsonResult = wilson(correctResults.size() + incorrectResults.size(), correctResults.size());
             logger.info(">> Wilson Intervall: Center = {}%, Distance = {}%", wilsonResult[0]*100, wilsonResult[1]*100);
         } while (correctResults.size() + incorrectResults.size() == 0 || wilsonResult[1] > 0.05);
-        
-        if (correctOutFile != null)
-            FileUtils.writeFileContent(correctOutFile, correctResults);
-        
-        if (incorrectOutFile != null)
-            FileUtils.writeFileContent(incorrectOutFile, incorrectResults);
         
         logger.info(">>>> DONE");
     }
