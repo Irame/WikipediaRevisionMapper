@@ -175,6 +175,7 @@ public class DumpData {
             TIntList tmp = redirections.get(itK);
 
             if (tmp == null || tmp.isEmpty()) {
+                logger_.warn("Redirect page '{}' (id: {}) has no valid redirection", idTitleMap.get(redirectId), redirectId);
                 return itK;
             }
 
