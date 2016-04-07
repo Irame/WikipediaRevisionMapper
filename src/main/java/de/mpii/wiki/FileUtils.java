@@ -52,6 +52,7 @@ public class FileUtils {
     }
 
     private static String titleToWikiLink(String title) throws UnsupportedEncodingException {
+        if (title == null) return "";
         return "http://en.wikipedia.org/wiki/" + URLEncoder.encode(title, StandardCharsets.UTF_8.name()).replace("+", "_");
     }
 
