@@ -9,9 +9,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 public class DumpReader {
     //Xml markups used in Wikipedia dump file.
@@ -26,7 +25,7 @@ public class DumpReader {
     public static void read(File file, DumpData data) throws XMLStreamException, FileNotFoundException {
         XMLInputFactory factory = XMLInputFactory.newInstance();
 
-        XMLEventReader newDumpTitleReader = factory.createXMLEventReader(new FileReader(file));
+        XMLEventReader newDumpTitleReader = factory.createXMLEventReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
         XMLEventReader newDumpContentReader = factory.createXMLEventReader(new FileReader(file));
 
         read(newDumpTitleReader, data, DumpReader.ReadMode.TITLE);
@@ -59,8 +58,9 @@ public class DumpReader {
                             pageId = Integer.parseInt(reader.nextEvent().asCharacters().getData());
                             break;
                         case PAGE_TITLE_TAG:
-                            if (readMode == ReadMode.TITLE)
+                            if (readMode == ReadMode.TITLE) {
                                 title = reader.nextEvent().asCharacters().getData();
+                            }
                             break;
                         default:
                             break;
@@ -83,7 +83,7 @@ public class DumpReader {
                             logger_.warn("Invalid Page Entry");
                         } else if (readMode == ReadMode.TITLE) {
                             logger_.debug("Extracted page : " + title + "(id : " + pageId + ")");
-                            data.addPageEntry(pageId, title);
+                             data.addPageEntry(pageId, title);
                         } else if (readMode == ReadMode.CONTENT) {
                             logger_.debug("Extracted page content (id : " + pageId + ")");
                             data.addContentInfo(pageId, pageText);
