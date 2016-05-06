@@ -93,7 +93,7 @@ public class DumpReader {
                         pageId = -1;
                         title = null;
                         pageText = null;
-                        if (++pagesProcessed % 100_000 == 0)
+                        if (++pagesProcessed % 1_000_000 == 0)
                             logger_.info("Processed: {} k", pagesProcessed/1000);
                         break;
                     default:

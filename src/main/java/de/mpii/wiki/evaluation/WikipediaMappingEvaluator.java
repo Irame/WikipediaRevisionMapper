@@ -73,7 +73,7 @@ public class WikipediaMappingEvaluator {
     private static void printHelp(Options commandLineOptions) {
         String header = "\n\nWikipediaRevisionMapperEvaluator:\n\n";
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("WikiTools", header,
+        formatter.printHelp("WikipediaRevisionMapperEvaluator", header,
             commandLineOptions, "", true);
         System.exit(0);
     }
