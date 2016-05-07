@@ -27,13 +27,10 @@ Output:
 
 ## Mapping Features
 
-TODO Check if this is still correct. Also: isn't this only done when the ID has changed?
-
 The following are the criteria for mapping source urls to target urls:
- * The source redirect or disambiguation page is mapped to the same url from the target dump (will be marked as SOURCE_IGNORED).
- * If the target page is a redirect, the source url is mapped to the last wiki page in the redirection chain.
- * If the target page is a disambiguation, outgoing links of source page are compared with outgoing links of each of the disambiguation choices. The target page with maximum similarity measure (using Jaccard overlap over the linked articles) is mapped to the source url.
- * A source entry that has been deleted in the target dump will be mapped to null.
+ * If the target page is a redirect and the source page isn't, the source url is mapped to the last wiki page in the redirection chain.
+ * If the target page is a disambiguation and the source page isn't, outgoing links of source page are compared with outgoing links of each of the disambiguation choices. The target page with maximum similarity measure (using Jaccard overlap over the linked articles) is mapped to the source url.
+ * A source entry that has been deleted in the target dump will be mapped to "".
  * A source url, that has same id as the target page but a different target title, will be mapped to updated title.
  * If none of the above conditions are satisfied, then the source url is unchanged in the target dump.
 
@@ -45,25 +42,42 @@ Input:
 
 Output:
  * A tab-separated UTF-8 text file where each line corresponds to one mapping with additional information:
- 
- TODO update to match the real thing
  	
- SOURCE-URL	TARGET-URL	MAP-TYPE	SRC-TEXT(eval mode)	TGT-TEXT(eval mode)
+ SOURCE-URL	TARGET-URL	MAP-TYPE
  	
  where MAP_TYPE can be:
- - REDIRECT	(__R__)  - The target URL is obtained via redirect page
- - REDIRECT_CYCLE (__RC__) - The target URL redirects to itself or to entry that redirects back to the URL.
- - DISAMBIGUATION (__D__)  - The mapping is obtained by computing the similarity of source URL with all disambiguate pages the target points to.
- - UNCHANGED (__UC__)	- Source page is same as target.
- - UPDATED (__UP__)		- Source page id is same as target id but title information has been changed
- - DELETED (__DL__)		- The page entry in source dump has been removed in the target.
- - SOURCE_IGNORED (__SI__)	- Source page is either a disambiguation or redirect page.
+ - REDIRECTED - The target URL is obtained via redirect page
+ - REDIRECTED_CYCLE - The target URL redirects to itself or to entry that redirects back to the URL.
+ - DISAMBIGUATED - The mapping is obtained by computing the similarity of source URL with all disambiguate pages the target points to.
+ - REDIRECTED_DISAMBIGUATED - The source page is a redirect page and the target of this redirection is used for the similarity measurement.
+ - REDIRECTED_CYCLE_DISAMBIGUATED - The source URL redirects to itself or to entry that redirects back to the URL and the target page is a disambiguation page.
+ - UNCHANGED - Source page is same as target.
+ - UPDATED - Source page id is same as target id but title information has been changed
+ - DELETED - The page entry in source dump has been removed in the target.
 
-Sample: TODO update to match the real thing
+Sample:
 	
 	... (other mappings) ...
-	http://en.wikipedia.org/wiki/People%27s_Republic_of_China	http://en.wikipedia.org/wiki/China	__R__
+	http://en.wikipedia.org/wiki/People%27s_Republic_of_China	http://en.wikipedia.org/wiki/China	REDIRECTED
 	...
+
+### Evaluation Mode Output
+
+In evaluation mode the output file is a XML file which holds more detailed information then the normal output:
+
+```
+MappingResult
+  ↳ Entry
+      ↳ MappingType
+      ↳ SourceId
+      ↳ SourceTitle
+     [↳ SourceText]
+      ↳ TargetId
+      ↳ TargetTitle
+     [↳ TargetText]
+```
+`MappingResult` is the root and there is one `Entry` for each mapping.
+`SourceText` and `TargetText` are only there if the target page is a disambiguation and the source page isn't.
 
 ## Usage
 
@@ -76,7 +90,7 @@ mvn compile
 Run the mapping process:
 
 ```
-./scripts/run.sh --s <OLD_DUMP_FILE_PATH> --t <NEW_DUMP_FILE_PATH> --w <MAPPING_FILE>
+./scripts/run.sh -s <OLD_DUMP_FILE_PATH> -t <NEW_DUMP_FILE_PATH> -w <MAPPING_FILE> [-e]
 ```
 
 ## Requirements
@@ -90,7 +104,7 @@ To estimate how well the disambiguation heuristic works, we evaluated it in the 
 
 1. Around 1000 disambiguation entries are randomly selected from the result and are verified manually by comparing the source text and target text.
 2. Correctness value was finally computed based on the number of correctly mapped disambiguation entries using the Wilson Coefficient. (Some mappings whose source url itself is disambiguation page which were not filtered due use of old marker texts are ignored while computing the correctness)
-3. TODO give the actual numbers here
+3. The correctness lies currently at 81.29%.
 
 ## Authors
 
